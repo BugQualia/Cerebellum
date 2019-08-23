@@ -65,13 +65,14 @@ class ION:
     def __init__(self, cell_count, in_size, freq):
         self.cell_count = cell_count
         self.freq = freq
-        self.v = np.random.randint(0, 2, cell_count)*2-1
+        self.v = np.random.randint(0, 2, cell_count)*0.8-0.4
         self.cell_output = np.zeros(cell_count)
         self.dv = np.zeros(cell_count)
         self.map = np.random.uniform(0, 0.003, (cell_count, in_size))
+        self.map_chem = np.random.uniform(0, 0.4, (cell_count, in_size))
 
-    def update(self, elec_in):
-        curr = np.dot(self.map, elec_in)
+    def update(self, elec_in, chem_in):
+        curr = np.dot(self.map, elec_in) + chem_in
         self.dv = self.dv - self.v * self.freq
         self.v = np.arctan(self.v + self.dv + curr)
         self.cell_output = np.zeros(self.cell_count)
@@ -82,42 +83,20 @@ class ION:
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    hist = np.zeros((1000, 10))
-    ion = ION(20, 20, np.concatenate([np.full(10, 0.02), np.full(10, 0.026)]))
+    hist = np.zeros((10000, 10))
+    ion = ION(20, 20, np.random.uniform(0.02, 0.03, 20))
     tmp = np.zeros(20)
-    for i in range(1000):
-        hist[i] = ion.update(tmp)[0:10]
-        tmp = ion.v
-        if i == 200:
-            tmp[5] = 1
-        if i == 300:
-            tmp[6] = 1
+    chem = np.zeros(20)
+    for i in range(10000):
+        if i == 1980:
+            chem[5] = 1
+        if i == 3000:
+            chem[6] = 1
+        hist[i] = ion.update(tmp, chem)[0:10]
+        tmp = ion.v + ion.cell_output
+        chem = np.zeros(20)
     plt.subplot(1, 2, 1)
     plt.plot(hist)
     plt.subplot(1, 2, 2)
     plt.plot(np.sum(hist, axis=1))
     plt.show()
-
-    # aa = (4 + 1j)/np.sqrt(17)
-    # bb = (4 - 1j)/np.sqrt(17)
-    # y = []
-    # for i in range(200):
-    #     y.append(aa**i + bb**i)
-    # print(np.real(y))
-    # plt.plot(np.real(y))
-    # plt.show()
-
-    # y1 = [0.23162855960858492, -0.07944159167794967, -0.2546310706197991, -0.05573934925323282, 0.2441876099420363]
-    # y2 = [-0.25563021183483203, -0.03603669780124944, 0.25331225900236054, 0.21104476680487766, -0.10959098648913836]
-    #
-    # for i in range(10000):
-    #     i1_in = np.dot(np.array(y1[-5:]), np.array([0.7, 0.2, 0, 0, 0]))
-    #     i2_in = np.dot(np.array(y1[-5:]), np.array([0, 0, 0, 0.2, 0.7]))
-    #     dy = i1_in - i2_in
-    #     y1.append(np.arctan(y1[-1] + dy))
-    # print(y1)
-    # plt.subplot(1, 2, 1)
-    # plt.plot(y1)
-    # plt.subplot(1, 2, 2)
-    # plt.plot(np.real(np.fft.fft(y1)))
-    # plt.show()
