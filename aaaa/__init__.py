@@ -1,1 +1,1 @@
-__all__ = ['Cerebellum', 'frequently_used', 'internals']
+__all__ = ['Cerebellum', 'internals']
