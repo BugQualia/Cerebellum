@@ -90,6 +90,7 @@ class ION:
         self.cell_output = np.zeros(cell_count)
         self.dv = np.zeros(cell_count)
         self.map = np.random.uniform(0, 0.003, (cell_count, in_size))
+        # TODO: Electric junctions in curren ION implementation only sends information in one direction, when in reality its bidirectional
         self.map_chem = np.random.uniform(0, 0.4, (cell_count, in_size))
 
     def update(self, elec_in, chem_in):
